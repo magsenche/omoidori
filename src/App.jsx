@@ -137,7 +137,7 @@ function App() {
         <div className="welcome-screen">
           <h1>🌋 Zouzou et Zaza</h1>
           <p className="subtitle">Calendrier de l'avent des potes</p>
-          <p className="description">Des nouvelles photos tous les jours !</p>
+          <p className="description">Parce que vous êtes loin mais pas oubliés, une petite dose quotidienne de chez nous pour réchauffer vos cœurs (et vos yeux) !</p>
           
           <div className="entries-grid">
             {entries.length === 0 ? (
