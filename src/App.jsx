@@ -13,6 +13,7 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const [expandedEntry, setExpandedEntry] = useState(null)
+  const [sortOrder, setSortOrder] = useState('desc') // 'asc' or 'desc'
   
   // Formulaire admin
   const [newDate, setNewDate] = useState('')
@@ -31,7 +32,7 @@ function App() {
       const { data, error } = await supabase
         .from('entries')
         .select('*')
-        .order('date', { ascending: true })
+        .order('date', { ascending: sortOrder === 'asc' })
 
       if (error) throw error
       setEntries(data || [])
@@ -41,6 +42,11 @@ function App() {
       setLoading(false)
     }
   }
+
+  // Reload when sort order changes
+  useEffect(() => {
+    if (!loading) loadEntries()
+  }, [sortOrder])
 
   const handlePhotoUpload = async (e) => {
     e.preventDefault()
@@ -139,7 +145,29 @@ function App() {
                 <p>✨ Les premiers souvenirs arrivent bientôt...</p>
               </div>
             ) : (
-              entries.map((entry, index) => {
+              <>
+                <div className="navigation-bar">
+                  <div className="nav-info">
+                    <span className="nav-count">{entries.length} souvenir{entries.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="nav-controls">
+                    <button 
+                      className={`nav-button ${sortOrder === 'desc' ? 'active' : ''}`}
+                      onClick={() => setSortOrder('desc')}
+                      title="Plus récents en premier"
+                    >
+                      📅 Récents
+                    </button>
+                    <button 
+                      className={`nav-button ${sortOrder === 'asc' ? 'active' : ''}`}
+                      onClick={() => setSortOrder('asc')}
+                      title="Plus anciens en premier"
+                    >
+                      🕐 Anciens
+                    </button>
+                  </div>
+                </div>
+                {entries.map((entry, index) => {
                 const unlocked = isDateUnlocked(entry.date)
                 const rotation = (index % 3 - 1) * 2 // Slight rotation: -2deg, 0deg, 2deg
                 return (
@@ -179,7 +207,8 @@ function App() {
                     )}
                   </div>
                 )
-              })
+              })}
+              </>
             )}
           </div>
 

@@ -75,6 +75,68 @@ h1 {
   padding: 20px;
 }
 
+/* Navigation Bar */
+.navigation-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 15px 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.nav-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-count {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.nav-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.nav-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nav-button.active {
+  background: white;
+  color: #ff6b9d;
+  border-color: white;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+}
+
+.nav-button.active:hover {
+  transform: translateY(-2px);
+}
+
 .no-entries {
   grid-column: 1 / -1;
   text-align: center;
@@ -493,6 +555,27 @@ h1 {
     grid-template-columns: 1fr;
     gap: 30px;
     padding: 10px;
+  }
+
+  .navigation-bar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .nav-info {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-button {
+    flex: 1;
+    max-width: 150px;
   }
 
   .polaroid {
