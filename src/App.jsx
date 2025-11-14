@@ -135,9 +135,9 @@ function App() {
     return (
       <div className="container">
         <div className="welcome-screen">
-          <h1>🌸 Omoidori</h1>
-          <p className="subtitle">思い出通り - La rue des souvenirs</p>
-          <p className="description">Découvrez chaque jour une nouvelle photo et un message de vos amis !</p>
+          <h1>🌋 Zouzou et Zaza</h1>
+          <p className="subtitle">Calendrier de l'avent des potes</p>
+          <p className="description">Des nouvelles photos tous les jours !</p>
           
           <div className="entries-grid">
             {entries.length === 0 ? (
