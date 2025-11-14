@@ -12,6 +12,7 @@ function App() {
   const [entries, setEntries] = useState([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [expandedEntry, setExpandedEntry] = useState(null)
   
   // Formulaire admin
   const [newDate, setNewDate] = useState('')
@@ -138,24 +139,41 @@ function App() {
                 <p>✨ Les premiers souvenirs arrivent bientôt...</p>
               </div>
             ) : (
-              entries.map((entry) => {
+              entries.map((entry, index) => {
                 const unlocked = isDateUnlocked(entry.date)
+                const rotation = (index % 3 - 1) * 2 // Slight rotation: -2deg, 0deg, 2deg
                 return (
-                  <div key={entry.id} className={`entry-card ${!unlocked ? 'locked' : ''}`}>
+                  <div 
+                    key={entry.id} 
+                    className={`polaroid ${!unlocked ? 'locked' : ''}`}
+                    style={{ transform: `rotate(${rotation}deg)` }}
+                    onClick={() => unlocked && setExpandedEntry(entry)}
+                  >
                     {unlocked ? (
                       <>
-                        <div className="entry-date">{formatDate(entry.date)}</div>
-                        <div className="photo-container">
+                        <div className="polaroid-photo">
                           <img src={entry.photo_url} alt="Photo du jour" loading="lazy" />
                         </div>
-                        <div className="entry-message">{entry.message}</div>
+                        <div className="polaroid-caption">
+                          <div className="polaroid-date">{formatDate(entry.date)}</div>
+                          <div className="polaroid-message">
+                            {entry.message.length > 60 ? `${entry.message.substring(0, 60)}...` : entry.message}
+                          </div>
+                          {entry.message.length > 60 && (
+                            <div className="click-hint">👆 Cliquez pour lire la suite</div>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <>
-                        <div className="entry-date">{formatDate(entry.date)}</div>
-                        <div className="locked-content">
-                          <span className="lock-icon">🔒</span>
-                          <p>Cette photo sera disponible ce jour-là !</p>
+                        <div className="polaroid-photo locked-photo">
+                          <div className="locked-content">
+                            <span className="lock-icon">🔒</span>
+                            <p>Disponible le<br/>{formatDate(entry.date)}</p>
+                          </div>
+                        </div>
+                        <div className="polaroid-caption">
+                          <div className="polaroid-message">À découvrir bientôt...</div>
                         </div>
                       </>
                     )}
@@ -164,6 +182,21 @@ function App() {
               })
             )}
           </div>
+
+          {expandedEntry && (
+            <div className="modal-overlay" onClick={() => setExpandedEntry(null)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close" onClick={() => setExpandedEntry(null)}>✕</button>
+                <div className="modal-photo">
+                  <img src={expandedEntry.photo_url} alt="Photo" />
+                </div>
+                <div className="modal-text">
+                  <div className="modal-date">{formatDate(expandedEntry.date)}</div>
+                  <div className="modal-message">{expandedEntry.message}</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <button 
             className="admin-button"
