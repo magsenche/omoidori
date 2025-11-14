@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import PasswordPrompt from './PasswordPrompt'
 import './App.css'
 
 // Configuration Supabase - Variables d'environnement
@@ -9,23 +10,44 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 function App() {
+  const [userType, setUserType] = useState(null) // null, 'viewer', 'contributor', 'admin'
   const [entries, setEntries] = useState([])
-  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const [expandedEntry, setExpandedEntry] = useState(null)
   const [sortOrder, setSortOrder] = useState('desc') // 'asc' or 'desc'
   
-  // Formulaire admin
+  // Formulaire admin/contributor
   const [newDate, setNewDate] = useState('')
   const [newMessage, setNewMessage] = useState('')
   const [newPhoto, setNewPhoto] = useState(null)
   const [uploading, setUploading] = useState(false)
 
-  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD
-
+  // Load entries on mount
   useEffect(() => {
     loadEntries()
   }, [])
+
+  const handlePasswordSubmit = (password) => {
+    const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD
+    const VIEWER_PASSWORD = import.meta.env.VITE_VIEWER_PASSWORD
+    const CONTRIBUTOR_PASSWORD = import.meta.env.VITE_CONTRIBUTOR_PASSWORD
+
+    if (password === ADMIN_PASSWORD) {
+      setUserType('admin')
+      return true
+    } else if (password === VIEWER_PASSWORD) {
+      setUserType('viewer')
+      return true
+    } else if (password === CONTRIBUTOR_PASSWORD) {
+      setUserType('contributor')
+      return true
+    }
+    return false
+  }
+
+  const handleSignOut = () => {
+    setUserType(null)
+  }
 
   const loadEntries = async () => {
     try {
@@ -45,7 +67,7 @@ function App() {
 
   // Reload when sort order changes
   useEffect(() => {
-    if (!loading) loadEntries()
+    if (userType) loadEntries()
   }, [sortOrder])
 
   const handlePhotoUpload = async (e) => {
@@ -125,19 +147,29 @@ function App() {
       <div className="container">
         <div className="loading">
           <div className="spinner"></div>
-          <p>Chargement des souvenirs...</p>
+          <p>Chargement...</p>
         </div>
       </div>
     )
   }
 
-  if (!isAdmin) {
+  // Show password prompt if not authenticated
+  if (!userType) {
+    return <PasswordPrompt onPasswordSubmit={handlePasswordSubmit} />
+  }
+
+  // VIEWER ROLE: Can only view photos (Zouzou & Zaza)
+  if (userType === 'viewer') {
     return (
       <div className="container">
         <div className="welcome-screen">
           <h1>🌋 Zouzou et Zaza</h1>
           <p className="subtitle">Calendrier de l'avent des potes</p>
-          <p className="description">Parce que vous êtes loin mais pas oubliés, une petite dose quotidienne de chez nous pour réchauffer vos cœurs (et vos yeux) !</p>
+          <p className="description">Parce que vous êtes loin mais pas oubliés, une petite dose quotidienne de chez nous pour réchauffer vos cœurs (et vos yeux) ! 📸✨</p>
+          
+          <button className="logout-button" onClick={handleSignOut}>
+            Se déconnecter
+          </button>
           
           <div className="entries-grid">
             {entries.length === 0 ? (
@@ -226,31 +258,85 @@ function App() {
               </div>
             </div>
           )}
-
-          <button 
-            className="admin-button"
-            onClick={() => {
-              const password = prompt('Mot de passe administrateur :')
-              if (password === ADMIN_PASSWORD) {
-                setIsAdmin(true)
-              } else if (password) {
-                alert('Mot de passe incorrect')
-              }
-            }}
-          >
-            Mode Admin
-          </button>
         </div>
       </div>
     )
   }
 
+  // CONTRIBUTOR ROLE: Can only upload photos (Friends)
+  if (userType === 'contributor') {
+    return (
+      <div className="container">
+        <div className="contributor-panel">
+          <h1>🌋 Ajouter un souvenir</h1>
+          <p className="subtitle">Partagez vos photos avec Zouzou et Zaza !</p>
+          
+          <button className="logout-button" onClick={handleSignOut}>
+            Se déconnecter
+          </button>
+
+          <form className="upload-form" onSubmit={handlePhotoUpload}>
+            <div className="form-group">
+              <label htmlFor="dateInput">Date :</label>
+              <input
+                id="dateInput"
+                type="date"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                required
+                disabled={uploading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="messageInput">Message :</label>
+              <textarea
+                id="messageInput"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Écrivez votre message pour Zouzou et Zaza..."
+                rows="4"
+                required
+                disabled={uploading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="photoInput">Photo :</label>
+              <input
+                id="photoInput"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNewPhoto(e.target.files[0])}
+                required
+                disabled={uploading}
+              />
+              {newPhoto && (
+                <p className="file-info">📷 {newPhoto.name} ({(newPhoto.size / 1024 / 1024).toFixed(2)} MB)</p>
+              )}
+            </div>
+
+            <button type="submit" className="submit-button" disabled={uploading}>
+              {uploading ? '⏳ Upload en cours...' : '✨ Envoyer la photo'}
+            </button>
+          </form>
+
+          <div className="contributor-note">
+            <p>✅ Votre photo sera ajoutée au calendrier et découverte par Zouzou et Zaza !</p>
+            <p className="note-hint">💝 Merci de participer à cette aventure</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ADMIN ROLE: Full access (You)
   return (
     <div className="container">
       <div className="admin-panel">
         <h1>🔧 Panneau Administrateur - Omoidori</h1>
-        <button className="logout-button" onClick={() => setIsAdmin(false)}>
-          Retour au mode visiteur
+        <button className="logout-button" onClick={handleSignOut}>
+          Se déconnecter
         </button>
 
         <form className="upload-form" onSubmit={handlePhotoUpload}>
@@ -301,19 +387,88 @@ function App() {
           </button>
         </form>
 
-        <div className="entries-list">
-          <h2>Souvenirs ajoutés ({entries.length})</h2>
+        <div className="navigation-bar" style={{marginTop: '2rem'}}>
+          <div className="nav-info">
+            <h2 style={{margin: 0, fontSize: '1.5rem'}}>Tous les souvenirs ({entries.length})</h2>
+          </div>
+          <div className="nav-controls">
+            <button 
+              className={`nav-button ${sortOrder === 'desc' ? 'active' : ''}`}
+              onClick={() => setSortOrder('desc')}
+            >
+              📅 Récents
+            </button>
+            <button 
+              className={`nav-button ${sortOrder === 'asc' ? 'active' : ''}`}
+              onClick={() => setSortOrder('asc')}
+            >
+              🕐 Anciens
+            </button>
+          </div>
+        </div>
+
+        <div className="entries-grid" style={{marginTop: '1rem'}}>
           {entries.length === 0 ? (
-            <p className="no-entries-admin">Aucun souvenir pour le moment. Ajoutez-en un ci-dessus !</p>
+            <p className="no-entries">Aucun souvenir pour le moment. Ajoutez-en un ci-dessus !</p>
           ) : (
-            entries.map((entry) => (
-              <div key={entry.id} className="entry-preview">
-                <strong>{formatDate(entry.date)}</strong>
-                <p>{entry.message}</p>
-              </div>
-            ))
+            entries.map((entry, index) => {
+              const unlocked = isDateUnlocked(entry.date)
+              const rotation = (index % 3 - 1) * 2
+              return (
+                <div 
+                  key={entry.id} 
+                  className={`polaroid ${!unlocked ? 'locked' : ''}`}
+                  style={{ transform: `rotate(${rotation}deg)` }}
+                  onClick={() => unlocked && setExpandedEntry(entry)}
+                >
+                  {unlocked ? (
+                    <>
+                      <div className="polaroid-photo">
+                        <img src={entry.photo_url} alt="Photo du jour" loading="lazy" />
+                      </div>
+                      <div className="polaroid-caption">
+                        <div className="polaroid-date">{formatDate(entry.date)}</div>
+                        <div className="polaroid-message">
+                          {entry.message.length > 60 ? `${entry.message.substring(0, 60)}...` : entry.message}
+                        </div>
+                        {entry.message.length > 60 && (
+                          <div className="click-hint">👆 Cliquez pour lire la suite</div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="polaroid-photo locked-photo">
+                        <div className="locked-content">
+                          <span className="lock-icon">🔒</span>
+                          <p>Disponible le<br/>{formatDate(entry.date)}</p>
+                        </div>
+                      </div>
+                      <div className="polaroid-caption">
+                        <div className="polaroid-message">À découvrir bientôt...</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })
           )}
         </div>
+
+        {expandedEntry && (
+          <div className="modal-overlay" onClick={() => setExpandedEntry(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setExpandedEntry(null)}>✕</button>
+              <div className="modal-photo">
+                <img src={expandedEntry.photo_url} alt="Photo" />
+              </div>
+              <div className="modal-text">
+                <div className="modal-date">{formatDate(expandedEntry.date)}</div>
+                <div className="modal-message">{expandedEntry.message}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
