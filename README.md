@@ -1,15 +1,16 @@
-# 🌸 Omoidori (思い出通り)
+# 🌋 Omoidori - Calendrier de l'Avent des Potes
 
-**La rue des souvenirs** - Un site web pour partager des photos et messages jour par jour avec vos amis en voyage.
+Un calendrier interactif style Y2K/Web 1.0 pour partager des souvenirs avec vos amis éloignés.
 
 ## ✨ Fonctionnalités
 
-- 📅 **Photos datées** : Chaque photo est associée à une date spécifique
-- 🔒 **Déblocage progressif** : Les photos ne sont visibles qu'à partir de leur date
-- 👀 **Consultation rétroactive** : On peut revoir toutes les photos passées
-- 🔧 **Interface admin** : Pour ajouter facilement de nouvelles photos
-- 📱 **Responsive** : Fonctionne sur mobile, tablette et ordinateur
-- 🎨 **Design japonisant** : Couleurs roses inspirées des cerisiers en fleurs
+- 📅 **Calendrier progressif** : Une photo se débloque chaque jour
+- 🔒 **Photos verrouillées** : Les photos futures restent cachées jusqu'à leur date
+- 👀 **Consultation rétroactive** : Revoir toutes les photos passées
+- 🎨 **Design Y2K** : Interface style années 2000 avec effets néons et stickers flottants
+- 📸 **Upload facile** : Interface d'administration intégrée
+- 📱 **Responsive** : Fonctionne sur tous les appareils
+- 🎭 **Stickers animés** : Photos de vos amis qui flottent en arrière-plan (chargés automatiquement)
 
 ## 🚀 Installation
 
@@ -23,7 +24,7 @@
 1. Allez sur [Supabase](https://supabase.com)
 2. Cliquez sur "New Project"
 3. Nommez-le "omoidori"
-4. Choisissez une région proche (Europe West recommandé)
+4. Choisissez une région proche
 5. Définissez un mot de passe pour la base de données
 6. Attendez que le projet soit créé (~2 minutes)
 
@@ -93,25 +94,13 @@ WITH CHECK ( bucket_id = 'omoidori-photos' );
 
 1. **Créer le fichier `.env`** à la racine du projet :
 ```bash
-# Copiez .env.example vers .env
-cp .env.example .env
-```
-
-2. **Remplacer les identifiants** dans `.env` :
-```bash
 VITE_SUPABASE_URL=https://VOTRE_PROJECT.supabase.co
 VITE_SUPABASE_ANON_KEY=VOTRE_ANON_KEY
-```
-
-3. **Changer le mot de passe admin** dans `src/App.jsx` (ligne 20) :
-```javascript
-const ADMIN_PASSWORD = 'omoidori2024' // Changez-le !
 ```
 
 ### 4. Installation des dépendances
 
 ```bash
-cd omoidori
 npm install
 ```
 
@@ -123,81 +112,74 @@ npm run dev
 
 Le site sera accessible sur `http://localhost:5173`
 
-## 📦 Déploiement Gratuit
+## 📦 Déploiement
 
-### Option 1 : Vercel (Recommandé) ⭐
+### Vercel
 
 1. Créez un compte sur [Vercel](https://vercel.com)
-2. Déployez :
+2. Installez Vercel CLI : `npm i -g vercel`
+3. Déployez :
 ```bash
 npm run build
-npx vercel
+vercel
 ```
 
-**URL** : Vous obtiendrez une URL comme `https://omoidori.vercel.app`
+**Important** : Ajoutez vos variables d'environnement dans les paramètres Vercel :
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 
-### Option 2 : Netlify
+## 🎨 Personnalisation
 
-1. Créez un compte sur [Netlify](https://netlify.com)
-2. Déployez :
-```bash
-npm run build
-npx netlify-cli deploy --prod
-```
+### Ajouter des stickers d'amis
 
-**URL** : Vous obtiendrez une URL comme `https://omoidori.netlify.app`
-
-### Option 3 : Cloudflare Pages
-
-1. Créez un compte sur [Cloudflare Pages](https://pages.cloudflare.com)
-2. Connectez votre dépôt Git
-3. Configuration :
-   - Build command: `npm run build`
-   - Output directory: `dist`
+Les stickers se chargent **automatiquement** ! Il suffit de :
+1. Placer vos photos PNG dans `/public/stickers/`
+2. Nommer les fichiers (ex: `prenom.png`)
+3. Elles apparaîtront automatiquement en arrière-plan
 
 ## 📱 Utilisation
 
 ### Mode Visiteur (vos amis)
-1. Partagez l'URL du site avec vos amis
+1. Partagez l'URL du site
 2. Ils verront les photos débloquées jour par jour
 3. Les photos futures apparaissent verrouillées 🔒
-4. Les photos passées sont toutes accessibles
+4. Cliquer sur une photo pour la voir en grand
 
-### Mode Admin (vous et les contributeurs)
-1. Cliquez sur "Mode Admin" en bas de la page
-2. Entrez le mot de passe (celui configuré dans le code)
-3. Remplissez le formulaire :
-   - **Date** : Quand la photo doit être débloquée
-   - **Message** : Votre mot pour vos amis
+### Mode Upload (contributeurs)
+1. Cliquez sur "➕ AJOUTER UN SOUVENIR"
+2. Remplissez le formulaire :
+   - **Date** : Choisissez la date de déblocage (date picker natif)
+   - **Message** : Votre mot pour les amis
    - **Photo** : Sélectionnez l'image
-4. Cliquez sur "✨ Ajouter la photo"
-5. C'est fait ! La photo apparaîtra automatiquement à la date choisie
+3. Cliquez sur "🚀 ENVOYER LA PHOTO ! 🚀"
+4. La photo apparaîtra automatiquement à la date choisie
 
-## 🎨 Personnalisation
+**Note** : Pas de système de mot de passe dans cette version. L'URL de l'interface d'upload doit être gardée privée.
 
-### Changer les couleurs
-Éditez `src/App.css` (ligne 7) :
-```css
-background: linear-gradient(135deg, #ffa5d8 0%, #ff6b9d 50%, #c44569 100%);
-/* Changez ces couleurs hex */
-```
+## 🎯 Fonctionnalités Techniques
 
-### Modifier les textes
-Tous les textes sont dans `src/App.jsx` et facilement modifiables.
-
-### Changer le mot de passe admin
-Dans `src/App.jsx` (ligne 18).
+### Design Y2K / Web 1.0
+- Effets néons et ombres colorées
+- Polices "Comic Sans MS" et "Impact"
+- Bordures pixelisées style Windows 95
+- Curseurs personnalisés
+- Texte défilant (marquee)
+- Stickers animés flottants
+- Scan lines rétro sur les photos
+- Animations flash et bounce
 
 ## 🔒 Sécurité
 
-### Niveau actuel : Bon pour usage privé
-- Mot de passe dans le code
-- URL privée partagée uniquement avec vos amis
+### Niveau actuel : Usage privé
+- Pas d'authentification (interface simple)
+- URL gardée secrète entre contributeurs
 - Bucket Supabase public (nécessaire pour l'affichage)
+- Politiques RLS basiques sur Supabase
 
-### Pour améliorer (si nécessaire)
-1. **Utiliser Supabase Auth** pour de vrais comptes utilisateurs
-2. **Sécuriser les politiques** pour n'autoriser que les utilisateurs authentifiés :
+### Pour améliorer (production)
+1. **Ajouter un mot de passe** pour l'interface d'upload
+2. **Utiliser Supabase Auth** pour de vrais comptes
+3. **Sécuriser les politiques RLS** :
 
 ```sql
 -- Lecture publique OK, mais écriture seulement si authentifié
@@ -209,83 +191,43 @@ WITH CHECK (true);
 
 ## 💡 Conseils
 
-- **Photos** : Compressez vos photos avant upload (max 2-3 MB recommandé)
-- **Dates** : Utilisez le fuseau horaire de La Réunion pour les dates
-- **Sauvegarde** : Supabase garde toutes vos données automatiquement
-- **Partage** : L'URL reste la même, partagez-la une seule fois
+- **Photos** : Compressez vos images (max 2-3 MB)
+- **Stickers** : Utilisez des PNG avec fond transparent
+- **Dates** : Attention au fuseau horaire (utilisez celui de vos amis)
+- **Backup** : Supabase sauvegarde automatiquement
 
-## 🐛 Dépannage
-
-### Les photos ne s'affichent pas
-- Vérifiez que le bucket `omoidori-photos` est **public**
-- Vérifiez les politiques de stockage (SELECT et INSERT)
-
-### Erreur "Invalid API key"
-- Vérifiez vos identifiants dans `src/App.jsx`
-- Assurez-vous d'utiliser la clé `anon public` et non la clé `service_role`
-
-### Erreur lors de l'upload
-- Vérifiez que la table `entries` existe
-- Vérifiez les politiques RLS (Row Level Security)
-
-### Le site ne se déploie pas
-- Vérifiez que `npm run build` fonctionne localement
-- Lisez les logs d'erreur du service de déploiement
-
-## 📊 Coûts Supabase (Plan Gratuit)
-
-**Tout est GRATUIT** avec ces limites :
-- 500 MB de base de données
-- 1 GB de stockage fichiers
-- 5 GB de transfert/mois
-- 2 projets gratuits
-
-**Pour votre usage** : Vous ne dépasserez jamais ces limites ! Un voyage de 2-3 semaines avec une photo par jour utilise moins de 100 MB.
-
-## 🔄 Avantages de Supabase vs Firebase
-
-✅ **Open source** : Code entièrement ouvert  
-✅ **PostgreSQL** : Base de données SQL puissante  
-✅ **Interface moderne** : Plus intuitive  
-✅ **Pas de surprise** : Limites claires  
-✅ **Temps réel** : Support WebSocket natif  
-✅ **API REST** : Automatiquement générée  
 
 ## 📝 Structure du projet
 
 ```
 omoidori/
+├── public/
+│   └── stickers/          # Photos d'amis (PNG) chargées automatiquement
 ├── src/
-│   ├── App.jsx          # Composant principal avec Supabase
-│   ├── App.css          # Styles japonisants
-│   ├── main.jsx         # Point d'entrée React
-│   └── index.css        # Styles globaux
-├── index.html           # Page HTML principale
-├── package.json         # Dépendances (Supabase inclus)
-├── vite.config.js       # Configuration Vite
-└── README.md           # Ce fichier
+│   ├── App.jsx            # Composant principal
+│   ├── App.css            # Styles Y2K/Web 1.0
+│   ├── FloatingStickers.jsx   # Stickers animés (auto-load)
+│   ├── FloatingStickers.css
+│   ├── BonusEffects.jsx   # Effets visuels bonus
+│   ├── main.jsx
+│   └── index.css
+├── .env                   # Variables Supabase (à créer)
+├── package.json
+├── vite.config.js
+└── README.md
 ```
 
-## 🎯 Roadmap potentielle
+## 🎯 Roadmap
 
-Fonctionnalités futures possibles :
-- [ ] Authentification sécurisée avec Supabase Auth
-- [ ] Commentaires sous les photos (avec temps réel)
-- [ ] Notifications par email (via Supabase Edge Functions)
-- [ ] Timeline interactive
-- [ ] Export PDF de tout le voyage
-- [ ] Mode hors ligne (PWA)
-- [ ] Réactions emoji sur les photos
+Fonctionnalités possibles :
+- [ ] Système de mot de passe simple pour l'upload
+- [ ] Authentification Supabase Auth
+- [ ] Commentaires sous les photos
+- [ ] Réactions emoji
+- [ ] Sons rétro au clic
 
 ## 🤝 Support
 
-Des questions ? Consultez :
-1. [Documentation Supabase](https://supabase.com/docs)
-2. [Guide SQL pour débutants](https://supabase.com/docs/guides/database/overview)
-3. [Communauté Supabase Discord](https://discord.supabase.com)
-
----
-
-Bon voyage à vos amis ! 🌴✈️
-
-**Omoidori** - 思い出通り - *Créé avec ❤️*
+- [Documentation Supabase](https://supabase.com/docs)
+- [Documentation Vite](https://vitejs.dev)
+- [Discord Supabase](https://discord.supabase.com)
